@@ -11,11 +11,9 @@ import org.axonframework.spring.stereotype.Aggregate;
 import org.example.eventsourcingcqrsaxon.command.command.AddAccountCommand;
 import org.example.eventsourcingcqrsaxon.command.command.CreditAccountCommand;
 import org.example.eventsourcingcqrsaxon.command.command.DebitAccountCommand;
+import org.example.eventsourcingcqrsaxon.command.command.UpdateAccountStatusCommand;
 import org.example.eventsourcingcqrsaxon.enums.AccountStatus;
-import org.example.eventsourcingcqrsaxon.event.AccountActivatedEvent;
-import org.example.eventsourcingcqrsaxon.event.AccountCreatedEvent;
-import org.example.eventsourcingcqrsaxon.event.AccountCreditedEvent;
-import org.example.eventsourcingcqrsaxon.event.AccountDebitedEvent;
+import org.example.eventsourcingcqrsaxon.event.*;
 
 @Slf4j
 @Getter
@@ -100,6 +98,23 @@ public class AccountAggregate {
         log.info("AccountDebitedEvent occurred");
         this.accountId = event.accountId();
         this.currentBalance = this.currentBalance - event.amount();
+    }
+
+    @CommandHandler
+    public void handle(UpdateAccountStatusCommand command){
+        log.info("UpdateAccountStatusCommand Command Received");
+        if (command.getStatus() == status) throw new RuntimeException("This account " + command.getId() + " is already " + command.getStatus());
+        AggregateLifecycle.apply(new AccountStatusUpdatedEvent(
+                command.getId(),
+                command.getStatus()
+        ));
+    }
+
+    @EventSourcingHandler
+    public void on(AccountStatusUpdatedEvent event){
+        log.info("AccountStatusUpdatedEvent occurred");
+        this.accountId = event.accountId();
+        this.status = event.status();
     }
 
 }

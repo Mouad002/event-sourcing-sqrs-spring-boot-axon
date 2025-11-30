@@ -6,9 +6,11 @@ import org.axonframework.eventsourcing.eventstore.EventStore;
 import org.example.eventsourcingcqrsaxon.command.command.AddAccountCommand;
 import org.example.eventsourcingcqrsaxon.command.command.CreditAccountCommand;
 import org.example.eventsourcingcqrsaxon.command.command.DebitAccountCommand;
+import org.example.eventsourcingcqrsaxon.command.command.UpdateAccountStatusCommand;
 import org.example.eventsourcingcqrsaxon.command.dto.AddNewAccountRequestDTO;
 import org.example.eventsourcingcqrsaxon.command.dto.CreditAccountRequestDTO;
-import org.example.eventsourcingcqrsaxon.command.dto.DebitAccountDTO;
+import org.example.eventsourcingcqrsaxon.command.dto.DebitAccountRequestDTO;
+import org.example.eventsourcingcqrsaxon.command.dto.UpdateAccountStatusRequestDTO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -47,13 +49,21 @@ public class AccountCommandController {
         return result;
     }
 
-
     @PostMapping("/debit")
-    public CompletableFuture<String> debitAccount(@RequestBody DebitAccountDTO request){
+    public CompletableFuture<String> debitAccount(@RequestBody DebitAccountRequestDTO request){
         CompletableFuture<String> result = this.commandGateway.send(new DebitAccountCommand(
                 request.accountId(),
                 request.amount(),
                 request.currency()
+        ));
+        return result;
+    }
+
+    @PutMapping("/updateStatus")
+    public CompletableFuture<String> updateStatus(@RequestBody UpdateAccountStatusRequestDTO request){
+        CompletableFuture<String> result = this.commandGateway.send(new UpdateAccountStatusCommand(
+                request.accountId(),
+                request.status()
         ));
         return result;
     }
