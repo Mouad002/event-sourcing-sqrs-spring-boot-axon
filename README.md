@@ -109,4 +109,10 @@ public Stream eventStore(@PathVariable String accountId){
 ```
 
 
+## Queries
 
+- before we create query we create handlers for the events to project the events on our database and create the records.
+
+## Apis
+
+![](img/img.png)

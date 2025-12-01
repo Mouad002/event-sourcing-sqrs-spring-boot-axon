@@ -1,17 +1,15 @@
 package org.example.eventsourcingcqrsaxon.query.controller;
 
-import org.axonframework.eventhandling.EventMessage;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
-import org.axonframework.queryhandling.SubscriptionQueryResult;
+import org.example.eventsourcingcqrsaxon.query.dto.AccountStatementResponseDTO;
 import org.example.eventsourcingcqrsaxon.query.entity.Account;
+import org.example.eventsourcingcqrsaxon.query.query.GetAccountStatementQuery;
 import org.example.eventsourcingcqrsaxon.query.query.GetAllAccountsQuery;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Flow;
 
 @RestController
 @RequestMapping("/query/accounts")
@@ -25,10 +23,19 @@ public class AccountQueryController {
 
     @GetMapping("/all")
     public CompletableFuture<List<Account>> getAllAccounts(){
-        CompletableFuture<List<Account>> result = queryGateway.query(new GetAllAccountsQuery(), ResponseTypes.multipleInstancesOf(Account.class));
+        CompletableFuture<List<Account>> result = queryGateway.query(
+                new GetAllAccountsQuery(),
+                ResponseTypes.multipleInstancesOf(Account.class)
+        );
         return result;
     }
 
-
+    @GetMapping("/accountStatement/{accountId}")
+    public CompletableFuture<AccountStatementResponseDTO> getAccountStatement(@PathVariable String accountId) {
+        return queryGateway.query(
+                new GetAccountStatementQuery(accountId),
+                ResponseTypes.instanceOf(AccountStatementResponseDTO.class)
+        );
+    }
 
 }
